@@ -12,6 +12,11 @@ class UserResource extends JsonResource
         return [
             'name' => $this->name,
             'email' => $this->email,
+            'preferences' => [
+                'sources' => $this->preferred_sources,
+                'categories' => CategoryResource::collection($this->whenLoaded('categories')),
+                'authors' => AuthorResource::collection($this->whenLoaded('authors')),
+            ],
         ];
     }
 }

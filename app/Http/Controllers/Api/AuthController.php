@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\AuthResource;
-use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -56,14 +55,5 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->noContent();
-    }
-
-    /**
-     * Me
-     */
-    #[ResponseFromApiResource(UserResource::class, User::class)]
-    public function me(Request $request): UserResource
-    {
-        return UserResource::make($request->user());
     }
 }
