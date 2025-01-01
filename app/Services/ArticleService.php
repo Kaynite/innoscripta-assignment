@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Article;
+use App\Models\User;
 use Illuminate\Support\Facades\Pipeline;
 
 class ArticleService
@@ -26,5 +27,22 @@ class ArticleService
     public function getArticleById(int $id): Article
     {
         return Article::with(['author', 'category'])->findOrFail($id);
+    }
+
+    public function getUserFeed(User $user)
+    {
+        return Article::query()
+            ->where(function ($query) use ($user) {
+                $query->whereHas('author', function ($query) use ($user) {
+                    $query->whereIn('id', $user->authors()->pluck('id')->toArray());
+                })
+                    ->orWhereHas('category', function ($query) use ($user) {
+                        $query->whereIn('id', $user->categories()->pluck('id')->toArray());
+                    })
+                    ->orWhere('source', $user->preferred_sources);
+            })
+            ->with(['author', 'category'])
+            ->latest('id')
+            ->paginate();
     }
 }
