@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "^11.31",
+        "laravel/prompts": "^0.3.2",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9"
     },
@@ -25,7 +26,8 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+            "Innoscripta\\": "src/"
         }
     },
     "autoload-dev": {
