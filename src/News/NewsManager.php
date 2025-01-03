@@ -5,6 +5,7 @@ namespace Innoscripta\News;
 use Illuminate\Support\Manager;
 use Innoscripta\News\Drivers\NewsApi;
 use Innoscripta\News\Drivers\NewYorkTimes;
+use Innoscripta\News\Drivers\TheGuardian;
 
 class NewsManager extends Manager
 {
@@ -21,5 +22,10 @@ class NewsManager extends Manager
     public function createNewYorkTimesDriver(): NewYorkTimes
     {
         return new NewYorkTimes;
+    }
+
+    public function createTheGuardianDriver(): TheGuardian
+    {
+        return new TheGuardian;
     }
 }

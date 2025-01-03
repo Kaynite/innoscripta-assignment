@@ -46,4 +46,17 @@ class NewsArticle
             category: $article['news_desk'],
         );
     }
+
+    public static function fromTheGuardian(array $article): self
+    {
+        return new self(
+            title: $article['webTitle'],
+            content: $article['fields']['body'],
+            author: $article['fields']['byline'],
+            publishedAt: Carbon::parse($article['webPublicationDate']),
+            url: $article['webUrl'],
+            imageUrl: $article['fields']['thumbnail'],
+            category: $article['sectionName'],
+        );
+    }
 }
