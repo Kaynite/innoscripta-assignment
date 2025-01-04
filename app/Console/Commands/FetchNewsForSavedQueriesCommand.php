@@ -5,9 +5,7 @@ namespace App\Console\Commands;
 use App\Enums\ArticleSource;
 use App\Jobs\FetchNewsJob;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
-
-use function Laravel\Prompts\info;
+use Illuminate\Support\Facades\Storage;
 
 class FetchNewsForSavedQueriesCommand extends Command
 {
@@ -33,7 +31,7 @@ class FetchNewsForSavedQueriesCommand extends Command
         $queries = $this->getSavedQueries();
 
         if (empty($queries)) {
-            info('No saved queries found.');
+            $this->info('No saved queries found.');
 
             return;
         }
@@ -51,10 +49,8 @@ class FetchNewsForSavedQueriesCommand extends Command
         }
     }
 
-    private function getSavedQueries()
+    private function getSavedQueries(): array
     {
-        $filePath = storage_path('app/queries.json');
-
-        return File::exists($filePath) ? File::json($filePath, lock: true) : [];
+        return Storage::json('queries.json') ?? [];
     }
 }

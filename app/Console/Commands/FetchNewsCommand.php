@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Enums\ArticleSource;
 use App\Jobs\FetchNewsJob;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\multiselect;
@@ -95,12 +95,11 @@ class FetchNewsCommand extends Command
 
     public function saveQuery($query, $sources)
     {
-        $filePath = storage_path('app/queries.json');
-        $queries = File::exists($filePath) ? File::json($filePath, lock: true) : [];
+        $queries = Storage::json('queries.json') ?? [];
 
         if (! isset($queries[$query])) {
             $queries[$query] = $sources;
-            File::put($filePath, json_encode($queries));
+            Storage::put('queries.json', json_encode($queries));
         }
     }
 }
