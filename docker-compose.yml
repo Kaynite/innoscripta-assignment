@@ -1,0 +1,64 @@
+services:
+    php:
+        build:
+            context: ./
+            dockerfile: ./.docker/php/Dockerfile
+        depends_on:
+            - mysql
+            - redis
+        restart: unless-stopped
+    nginx:
+        image: nginx:alpine
+        ports:
+            - "80:80"
+        depends_on:
+            - php
+        volumes:
+            - ./.docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+            - ./:/var/www/html
+        restart: unless-stopped
+    mysql:
+        image: 'mysql/mysql-server:8.0'
+        ports:
+            - '${FORWARD_DB_PORT:-3306}:3306'
+        environment:
+            MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_DATABASE: '${DB_DATABASE}'
+            MYSQL_USER: '${DB_USERNAME}'
+            MYSQL_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_ALLOW_EMPTY_PASSWORD: 1
+        volumes:
+            - 'mysql:/var/lib/mysql'
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}"]
+            retries: 3
+            timeout: 5s
+        restart: unless-stopped
+    redis:
+        image: redis:alpine
+        volumes:
+            - redis:/data
+        ports:
+            - "6379:6379"
+    # queue:
+    #     build:
+    #         context: ./
+    #         dockerfile: ./.docker/php/Dockerfile
+    #     depends_on:
+    #         - mysql
+    #         - redis
+    #     command: php artisan queue:work
+    #     restart: unless-stopped
+    # scheduler:
+    #     build:
+    #         context: ./
+    #         dockerfile: ./.docker/php/Dockerfile
+    #     depends_on:
+    #         - mysql
+    #         - redis
+    #     command: php artisan schedule:run
+    #     restart: unless-stopped
+
+volumes:
+    mysql:
+    redis:

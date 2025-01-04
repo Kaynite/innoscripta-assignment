@@ -5,7 +5,7 @@ return [
 
     'drivers' => [
         'newsapi' => [
-            'key' => env('NEWS_API_KEY'),
+            'key' => env('NEWSAPI_API_KEY'),
         ],
 
         'new_york_times' => [
