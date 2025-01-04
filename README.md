@@ -37,27 +37,36 @@ This project is a Laravel-based RESTful API for a news aggregator service. The A
    - API Base URL: `http://localhost`
    - API Documentation: `http://localhost/docs`
 
-## Fetch News Command
+## FetchNews Command
+The `news:fetch` command fetches articles from various news sources based on a user-provided query and parameters. It also allows users to save queries for regular fetching.
 
-The application includes a custom Artisan command to fetch news articles from various sources. The command interacts with the user to collect inputs like query, sources, number of articles, and date range. It then fetches the articles and stores them in the database.
-
-### Command Details
-
-#### Command Signature:
+### Command Usage
+Run the command:
 ```bash
-php artisan news:fetch
+docker-compose exec php php artisan news:fetch
 ```
 
-#### Workflow:
-1. Prompts the user to input the following:
-   - **Search Query**: The term to search for in news articles.
-   - **Sources**: Select one or more sources from predefined options (e.g., NewsAPI, The Guardian).
-   - **Number of Articles**: Specify the number of articles to fetch (e.g., 10).
-   - **From Date**: (Optional) Start date for fetching articles (format: YYYY-MM-DD).
-   - **To Date**: (Optional) End date for fetching articles (format: YYYY-MM-DD).
-2. Fetches news articles from the selected sources using the query and other parameters.
-3. Stores the fetched articles in the database, creating related authors and categories as needed.
-4. Displays progress and notifies the user if no articles are found.
+### Command Workflow
+1. **Query Input:** Prompts for the news topic to search for.
+2. **Source Selection:** Allows users to select one or more news sources from a predefined list.
+3. **Save Query:** Optionally saves the query and sources to a `queries.json` file for future use.
+4. **Article Limits and Dates:** Prompts for the number of articles to fetch and optional date range.
+5. **Fetch Execution:** Fetches articles using the specified parameters and dispatches the `FetchNewsJob` for processing.
+
+### Saving Queries
+Saved queries are stored in `storage/app/queries.json`. If a query doesn't already exist in the file, it will be added with the associated sources.
+
+### Example Interaction
+```plaintext
+Enter the news you want to search for: Laravel
+Select the sources you want to search from: [NewsAPI, The Guardian]
+Do you want to regularly fetch news for this query and save them to the database? (yes/no): yes
+Enter the number of articles you want to fetch: 10
+Enter the date from which you want to fetch the articles: 2023-01-01
+Enter the date to which you want to fetch the articles: 2023-12-31
+Fetching news from NewsAPI...
+Fetching news from The Guardian...
+```
 
 ## Testing
 - Run the test suite using PestPHP:
