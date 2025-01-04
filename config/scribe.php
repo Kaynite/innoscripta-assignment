@@ -172,6 +172,7 @@ INTRO
         'order' => [
             'Auth',
             'User',
+            'Password Reset',
             '*',
             'Articles',
         ],
