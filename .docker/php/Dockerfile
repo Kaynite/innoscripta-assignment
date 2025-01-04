@@ -13,6 +13,7 @@ RUN apk --no-cache add \
     libxpm-dev \
     freetype-dev \
     libzip-dev \
+    curl-dev \
     zip \
     unzip \
     git \
@@ -27,7 +28,7 @@ RUN rm -rf /var/cache/apk/*
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && pecl install redis \
-    && docker-php-ext-install gd pdo pdo_mysql mbstring zip exif pcntl bcmath opcache \
+    && docker-php-ext-install gd pdo pdo_mysql mbstring zip exif pcntl bcmath opcache curl \
     && docker-php-ext-enable redis
 
 # Install Composer
