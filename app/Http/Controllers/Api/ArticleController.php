@@ -8,6 +8,7 @@ use App\Http\Resources\ArticleResource;
 use App\Models\Article;
 use App\Services\ArticleService;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Cache;
 use Knuckles\Scribe\Attributes\ResponseFromApiResource;
 
 /**
@@ -32,7 +33,11 @@ class ArticleController extends Controller
     #[ResponseFromApiResource(ArticleResource::class, Article::class)]
     public function show($article, ArticleService $articleService): ArticleResource
     {
-        $article = $articleService->getArticleById($article);
+        $article = Cache::remember(
+            key: "article_$article",
+            ttl: now()->day(),
+            callback: fn () => $articleService->getArticleById($article),
+        );
 
         return ArticleResource::make($article);
     }

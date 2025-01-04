@@ -3,15 +3,12 @@
 namespace App\Console\Commands;
 
 use App\Enums\ArticleSource;
-use App\Models\Article;
-use App\Models\Author;
-use App\Models\Category;
-use Carbon\Carbon;
+use App\Jobs\FetchNewsJob;
 use Illuminate\Console\Command;
-use Innoscripta\News\Facades\News;
+use Illuminate\Support\Facades\File;
 
+use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\multiselect;
-use function Laravel\Prompts\progress;
 use function Laravel\Prompts\text;
 
 class FetchNewsCommand extends Command
@@ -47,6 +44,12 @@ class FetchNewsCommand extends Command
             required: true
         );
 
+        $saveQuery = confirm(
+            label: 'Do you want to regularly fetch news for this query and save them to the database?',
+            default: true,
+            required: true
+        );
+
         $numberOfArticles = text(
             label: 'Enter the number of articles you want to fetch:',
             placeholder: 'e.g. 10',
@@ -68,6 +71,10 @@ class FetchNewsCommand extends Command
             validate: ['date'],
         );
 
+        if ($saveQuery) {
+            $this->saveQuery($query, $sources);
+        }
+
         foreach ($sources as $source) {
             $source = ArticleSource::from($source);
             $this->info("Fetching news from {$source->label()}...");
@@ -75,38 +82,25 @@ class FetchNewsCommand extends Command
         }
     }
 
-    protected function fetchNews(string $query, ArticleSource $source, int $numberOfArticles, ?string $from, ?string $to)
+    public function fetchNews(string $query, ArticleSource $source, int $numberOfArticles, ?string $from, ?string $to)
     {
-        $news = News::driver($source->value)->getNews(
+        FetchNewsJob::dispatchSync(
             query: $query,
+            source: $source,
             numberOfArticles: $numberOfArticles,
-            from: $from ? Carbon::parse($from) : null,
-            to: $to ? Carbon::parse($to) : null,
+            from: $from,
+            to: $to,
         );
+    }
 
-        if ($news->isEmpty()) {
-            $this->warn("No news articles found for {$source->label()}.");
+    public function saveQuery($query, $sources)
+    {
+        $filePath = storage_path('app/queries.json');
+        $queries = File::exists($filePath) ? File::json($filePath, lock: true) : [];
 
-            return;
+        if (! isset($queries[$query])) {
+            $queries[$query] = $sources;
+            File::put($filePath, json_encode($queries));
         }
-
-        progress(
-            label: "Fetching news articles for {$source->label()}...",
-            steps: $news,
-            callback: function ($article) use ($source) {
-                Article::firstOrCreate([
-                    'title' => $article->title,
-                    'source' => $source,
-                ], [
-                    'content' => $article->content,
-                    'url' => $article->url,
-                    'image_url' => $article->imageUrl,
-                    'author_id' => $article->author ? Author::firstOrCreate(['name' => $article->author])->id : null,
-                    'category_id' => $article->category ? Category::firstOrCreate(['name' => $article->category])->id : null,
-                    'published_at' => Carbon::parse($article->publishedAt),
-                ]);
-            },
-            hint: 'This may take some time.'
-        );
     }
 }

@@ -43,8 +43,4 @@ RUN composer install --no-interaction --optimize-autoloader
 RUN chmod +x ./.docker/php/entrypoint.sh
 RUN chmod +x ./.docker/php/wait-for-it.sh
 
-ENTRYPOINT ["bash", "/var/www/html/.docker/php/entrypoint.sh"]
-
 USER www-data
-
-CMD ["php-fpm"]
