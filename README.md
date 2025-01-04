@@ -37,6 +37,28 @@ This project is a Laravel-based RESTful API for a news aggregator service. The A
    - API Base URL: `http://localhost`
    - API Documentation: `http://localhost/docs`
 
+## Fetch News Command
+
+The application includes a custom Artisan command to fetch news articles from various sources. The command interacts with the user to collect inputs like query, sources, number of articles, and date range. It then fetches the articles and stores them in the database.
+
+### Command Details
+
+#### Command Signature:
+```bash
+php artisan news:fetch
+```
+
+#### Workflow:
+1. Prompts the user to input the following:
+   - **Search Query**: The term to search for in news articles.
+   - **Sources**: Select one or more sources from predefined options (e.g., NewsAPI, The Guardian).
+   - **Number of Articles**: Specify the number of articles to fetch (e.g., 10).
+   - **From Date**: (Optional) Start date for fetching articles (format: YYYY-MM-DD).
+   - **To Date**: (Optional) End date for fetching articles (format: YYYY-MM-DD).
+2. Fetches news articles from the selected sources using the query and other parameters.
+3. Stores the fetched articles in the database, creating related authors and categories as needed.
+4. Displays progress and notifies the user if no articles are found.
+
 ## Testing
 - Run the test suite using PestPHP:
   ```bash
@@ -51,3 +73,4 @@ This project is open-source and available under the [MIT License](LICENSE).
 For any questions or issues, please contact:
 - Email: ksaber276@gmail.com
 - GitHub: [Kaynite](https://github.com/kaynite)
+
