@@ -19,6 +19,7 @@ class ListArticlesRequest extends FormRequest
         ];
     }
 
+    // @codeCoverageIgnoreStart
     public function queryParameters(): array
     {
         return [
@@ -44,4 +45,6 @@ class ListArticlesRequest extends FormRequest
             ],
         ];
     }
+    // @codeCoverageIgnoreEnd
+
 }

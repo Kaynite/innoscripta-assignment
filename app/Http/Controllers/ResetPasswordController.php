@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ForgotPasswordRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,12 +16,8 @@ class ResetPasswordController extends Controller
     /**
      * Send password reset code.
      */
-    public function sendCode(Request $request)
+    public function sendCode(ForgotPasswordRequest $request)
     {
-        $request->validate([
-            'email' => ['required', 'email'],
-        ]);
-
         $user = User::where('email', $request->email)->first();
 
         if (! $user) {
@@ -46,14 +44,8 @@ class ResetPasswordController extends Controller
     /**
      * Reset password.
      */
-    public function reset(Request $request)
+    public function reset(ResetPasswordRequest $request)
     {
-        $request->validate([
-            'email' => ['required', 'email'],
-            'token' => ['required', 'string'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
-
         $token = DB::table('password_reset_tokens')
             ->where('email', $request->email)
             ->where('token', $request->token)
@@ -67,13 +59,13 @@ class ResetPasswordController extends Controller
         }
 
         User::where('email', $request->email)->update([
-            'password' => bcrypt($request->password),
+            'password' => $request->password,
         ]);
 
         DB::table('password_reset_tokens')->where('email', $request->email)->delete();
 
         return response()->json([
-            'message' => 'Password reset successful.',
+            'message' => 'Password reset successfully.',
         ]);
     }
 }
